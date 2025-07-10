@@ -32,12 +32,10 @@ import { MdOutlineAddIcCall } from 'react-icons/md';
 
 import React, { useContext, useState } from 'react';
 import { GlobalStateContext } from '../context/ContextProvider';
-import { object } from 'framer-motion/client';
 import useShowToast from '../hooks/useShowToast.js';
+import useEnquireHook from '../hooks/useEnquireHook.js';
 
 function Enquire() {
-  const { successEnquireToast, errorEnquireToast, infoEnquireToast } =
-    useShowToast();
   const { open, setOpen } = useContext(GlobalStateContext);
   const [enquireInputs, setEnquireInputs] = useState({
     fullName: '',
@@ -46,29 +44,28 @@ function Enquire() {
     subject: '',
     message: '',
   });
+  const { infoEnquireToast } = useShowToast();
+  const { handleEnquireSubmit, isLoading } = useEnquireHook();
 
-  function handleSubmit(e) {
+  // Function for submitting data to Enquire Hook
+  async function handleSubmit(e) {
     e.preventDefault();
     const enquireValues = Object.values(enquireInputs);
 
     for (const value of enquireValues) {
       if (value === '') {
         infoEnquireToast();
-        console.log('Info toast');
         return;
-      } else {
-        successEnquireToast();
-
-        console.log('Success');
-        setEnquireInputs({
-          fullName: '',
-          email: '',
-          contactNumber: '',
-          subject: '',
-          message: '',
-        });
       }
     }
+    await handleEnquireSubmit(enquireInputs);
+    setEnquireInputs({
+      fullName: '',
+      email: '',
+      contactNumber: '',
+      subject: '',
+      message: '',
+    });
   }
 
   return (
@@ -120,7 +117,7 @@ function Enquire() {
         <Portal>
           <DialogBackdrop bgColor={'#fa823f'} />
 
-          <DialogPositioner zIndex={1000}>
+          <DialogPositioner>
             <DialogContent bgColor={'#fa823f'}>
               {/**CLOSE DIALOG BUTTON */}
               <Flex pt={'1rem'} px={'1rem'} justifyContent={'end'}>
@@ -192,7 +189,7 @@ function Enquire() {
                   pt="2rem"
                   pb={'2rem'}
                   borderRadius={'10px'}
-                  w={{ base: '96%', md: '90%', lg: '90%', xl: '90%' }}
+                  w={{ base: '96%', md: '96%', lg: '96%', xl: '96%' }}
                   backgroundColor={'black'}
                   justifyContent={'space-evenly'}
                 >
@@ -250,7 +247,8 @@ function Enquire() {
                       </Text>
                     </VStack>
 
-                    <form onSubmit={handleSubmit}>
+                    {/**Enquire Form Side */}
+                    <form autoComplete="off" onSubmit={handleSubmit}>
                       <FieldsetContent>
                         <FieldRoot
                           pb={'4rem'}
@@ -430,6 +428,7 @@ function Enquire() {
                             focusRing={'none'}
                             borderColor={'#fa823f'}
                             type="text"
+                            autoComplete="new-subject"
                           />
                         </FieldRoot>
 
@@ -459,7 +458,12 @@ function Enquire() {
                             focusRing={'none'}
                             borderColor={'#fa823f'}
                             required
-                            h={'10rem'}
+                            h={{
+                              base: '4rem',
+                              md: '20rem',
+                              lg: '30rem',
+                              xl: '30rem',
+                            }}
                             w={{
                               base: '100%',
                               md: '80%',
@@ -474,6 +478,7 @@ function Enquire() {
                             }
                             value={enquireInputs.message}
                             type="text"
+                            autoComplete="new-message"
                           />
                         </FieldRoot>
                         <Button
@@ -514,6 +519,7 @@ function Enquire() {
                             xl: 'start',
                           }}
                           type="submit"
+                          loading={isLoading}
                         >
                           Submit
                         </Button>
@@ -521,6 +527,7 @@ function Enquire() {
                     </form>
                   </FieldsetRoot>
 
+                  {/**Contact and Operation Hours Side */}
                   <VStack
                     h={'fit-content'}
                     pb={'2rem'}
@@ -532,15 +539,15 @@ function Enquire() {
                       xl: 'start',
                     }}
                     borderRadius={'10px'}
-                    px={'2rem'}
+                    px={{ base: undefined, md: '2rem', lg: '2rem', xl: '2rem' }}
                     backgroundColor={'#fa823f'}
                     boxShadow={'1px 5px 10px 5px #fa823f'}
-                    w={{ base: '128%', md: '100%', lg: '60%', xl: '35%' }}
+                    w={{ base: '120%', md: '100%', lg: '70%', xl: '45%' }}
                     maxW={{
                       base: undefined,
                       md: undefined,
                       lg: undefined,
-                      xl: '35%',
+                      xl: '40%',
                     }}
                     alignSelf={{
                       base: 'center',
@@ -549,7 +556,7 @@ function Enquire() {
                       xl: 'start',
                     }}
                     css={{
-                      '@media (max-width: 343px)': {
+                      '@media (max-width: 350px)': {
                         w: '145%',
                       },
                     }}

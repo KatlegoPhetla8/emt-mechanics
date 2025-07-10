@@ -23,41 +23,41 @@ import {
   HStack,
   Icon,
   Portal,
+  Spinner,
   Text,
   VStack,
 } from '@chakra-ui/react';
 import { FaStar, FaTools } from 'react-icons/fa';
 import { IoIosArrowForward } from 'react-icons/io';
+import useDisplayReviews from '../hooks/useDisplayReviews.js';
 
 function ViewReviews() {
-  const postedReviews = [
-    {
-      userName: 'John Doe',
-      message: `Aaron was so helpful. He sent me a quote, and once I confirmed, he immediately started the service. 
-      Quick and efficient — I’m so happy!`,
-      ratingStars: 5,
-      photoURL: '/',
-    },
-    {
-      userName: 'Alex Doe',
-      message: `Aaron was so helpful. He sent me a quote, and once I confirmed, he immediately started the service. 
-      Quick and efficient — I’m so happy!`,
-      ratingStars: 3,
-      photoURL: '/',
-    },
-  ];
-  // Loop that inserts ratings into an array
-  for (const user of postedReviews) {
+  const { reviews, loading } = useDisplayReviews();
+
+  // Loop that inserts ratings into an array to display.
+  for (const review of reviews) {
     let ratingStarsArray = [];
-    for (let i = 0; i < user.ratingStars; i++) {
+    for (let i = 0; i < review.rating; i++) {
       ratingStarsArray[i] = i + 1;
     }
-    user.ratingArray = ratingStarsArray;
+    review.ratingArray = ratingStarsArray;
+  }
+  console.log(reviews);
+
+  // If loading the reviews then display the Spinner
+  if (loading) {
+    return (
+      <Box textAlign={'center'} p={8}>
+        {' '}
+        <Spinner size={'xl'} />
+      </Box>
+    );
   }
 
   return (
     <Flex justifyContent={'center'}>
       <DialogRoot modal={true} lazyMount placement={'top'} size={'full'}>
+        {/**Dialog trigger button */}
         <DialogTrigger asChild>
           <Text
             fontSize={{ base: '20px', md: '24px', lg: '26px', xl: '26px' }}
@@ -99,7 +99,7 @@ function ViewReviews() {
         <Portal>
           <DialogBackdrop bgColor={'#fa823f'} />
 
-          <DialogPositioner zIndex={1000}>
+          <DialogPositioner>
             <DialogContent bgColor={'#fa823f'}>
               {/**CLOSE DIALOG BUTTON */}
               <Flex pt={'1rem'} px={'1rem'} justifyContent={'end'}>
@@ -151,80 +151,103 @@ function ViewReviews() {
               </DialogHeader>
 
               <DialogBody justifyContent={'center'} pt={'4rem'}>
-                {postedReviews.map((user, index) => (
-                  <Flex
-                    key={index}
-                    px={'2rem'}
-                    mx={'auto'}
-                    w={{ base: '80%', md: '80%', lg: '50%', xl: '50%' }}
-                    mb={'2rem'}
-                    backgroundColor={'black'}
-                    justifyContent={'center'}
-                    pt={'2rem'}
-                    borderRadius={'10px'}
-                  >
-                    <VStack
-                      w={{ base: '100%', md: '100%', lg: '50%', xl: '50%' }}
-                      pb={'6rem'}
-                    >
-                      <AvatarRoot shape={'rounded'} colorPalette={'green'}>
-                        <AvatarFallback
-                          borderColor={'#fa823f'}
-                          backgroundColor={'#fa823f'}
-                          borderWidth={'4px'}
-                          p={'18px'}
-                          borderRadius={'90%'}
-                          fontSize={{
-                            base: '16px',
-                            md: '18px',
-                            lg: '20px',
-                            xl: '20px',
-                          }}
-                          color="black"
-                          name={user.userName}
-                        />
-                        <AvatarImage src={user.photoURL} />
-                      </AvatarRoot>
-                      <Text
-                        textAlign={'center'}
-                        fontWeight={'700'}
-                        pb={'1rem'}
-                        fontSize={{
-                          base: '18px',
-                          md: '20px',
-                          lg: '22px',
-                          xl: '22px',
-                        }}
-                        as={'h2'}
-                        pt={'1rem'}
+                {reviews.length !== 0 ? (
+                  <>
+                    {reviews.map((review, index) => (
+                      <Flex
+                        key={index}
+                        px={'2rem'}
+                        mx={'auto'}
+                        w={{ base: '80%', md: '80%', lg: '50%', xl: '50%' }}
+                        mb={'2rem'}
+                        backgroundColor={'black'}
+                        justifyContent={'center'}
+                        pt={'2rem'}
+                        borderRadius={'10px'}
                       >
-                        {user.userName}
-                      </Text>
-                      <Text
-                        textAlign={'center'}
-                        fontSize={{ base: '16px', md: '18px', lg: '20px' }}
-                      >
-                        {user.message}
-                      </Text>
-                      <HStack>
-                        {user.ratingArray?.map((_, index) => (
-                          <Box key={index}>
-                            <Icon
-                              as={FaStar}
-                              boxSize={{
-                                base: '20px',
-                                md: '22px',
-                                lg: '24px',
-                                xl: '24px',
+                        <VStack
+                          w={{ base: '100%', md: '100%', lg: '50%', xl: '50%' }}
+                          pb={'6rem'}
+                        >
+                          <AvatarRoot
+                            shape={'full'}
+                            size={'xl'}
+                            variant={'subtle'}
+                          >
+                            <AvatarFallback
+                              borderColor={'#fa823f'}
+                              backgroundColor={'#fa823f'}
+                              borderWidth={'4px'}
+                              p={'18px'}
+                              borderRadius={'90%'}
+                              fontSize={{
+                                base: '16px',
+                                md: '18px',
+                                lg: '20px',
+                                xl: '20px',
                               }}
-                              color={'#fa823f'}
+                              color="black"
+                              name={review.userName}
                             />
-                          </Box>
-                        ))}
-                      </HStack>
-                    </VStack>
+                            <AvatarImage src={review.photoURL} />
+                          </AvatarRoot>
+                          <Text
+                            textAlign={'center'}
+                            fontWeight={'700'}
+                            pb={'1rem'}
+                            fontSize={{
+                              base: '18px',
+                              md: '20px',
+                              lg: '22px',
+                              xl: '22px',
+                            }}
+                            as={'h2'}
+                            pt={'1rem'}
+                          >
+                            {review.userName}
+                          </Text>
+                          <Text
+                            textAlign={'center'}
+                            fontSize={{ base: '16px', md: '18px', lg: '20px' }}
+                          >
+                            {review.reviewMessage}
+                          </Text>
+                          <HStack>
+                            {review.ratingArray?.map((_, index) => (
+                              <Box key={index}>
+                                <Icon
+                                  as={FaStar}
+                                  boxSize={{
+                                    base: '20px',
+                                    md: '22px',
+                                    lg: '24px',
+                                    xl: '24px',
+                                  }}
+                                  color={'#fa823f'}
+                                />
+                              </Box>
+                            ))}
+                          </HStack>
+                        </VStack>
+                      </Flex>
+                    ))}
+                  </>
+                ) : (
+                  <Flex justifyContent={'center'}>
+                    <Text
+                      textAlign={'center'}
+                      fontSize={{
+                        base: '30px',
+                        md: '34px',
+                        lg: '38px',
+                        xl: '40px',
+                      }}
+                      color={'black'}
+                    >
+                      No Reviews Yet.
+                    </Text>
                   </Flex>
-                ))}
+                )}
               </DialogBody>
             </DialogContent>
           </DialogPositioner>

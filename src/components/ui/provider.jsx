@@ -9,16 +9,19 @@ export function Provider(props) {
     theme: {
       tokens: {
         fonts: {
-          heading: { value: `"league-spartan", 'verdana` },
+          heading: { value: `"league-spartan", 'verdana'` },
           body: { value: `"league-spartan", 'verdana'` },
+        },
+        colors: {
+          primary: { value: 'rgb(250, 130, 63)' },
+          secondary: { value: 'rgb(250, 130, 63)' },
         },
       },
     },
     globalCss: {
       'html, body': {
-        color: '#fa823f',
+        color: 'rgb(250, 130, 63)',
         bgColor: 'whiteAlpha.800',
-        fontFamily: 'verdana',
       },
     },
   });

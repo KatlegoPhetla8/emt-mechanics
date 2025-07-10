@@ -11,7 +11,7 @@ function Home() {
   const { homeRef, servicesRef, aboutRef } = useContext(GlobalStateContext);
 
   return (
-    <Container pb={'8rem'}>
+    <Box pb={'8rem'}>
       <Box
         minH={'1000px'}
         overscrollBehavior={'contain'}
@@ -19,7 +19,7 @@ function Home() {
         className="hero-section"
         position={'relative'}
         height={{ base: '100vh', md: '100vh', lg: '100vh', xl: '100vh' }}
-        w={'auto'}
+        w={'100%'}
         bgImage={`url("/Hero.png")`}
         transition={'filter 0.3s ease'}
         bgSize={'cover'}
@@ -36,7 +36,6 @@ function Home() {
         pt={{ base: undefined, md: '40px', lg: '60px' }}
         px={'1.5rem'}
         gap={{ base: '1.5rem', md: '1rem', lg: '1rem', xl: '1.5rem' }}
-        filter={'blur(50%)'}
       >
         <Heading
           lineHeight={{ base: '3.5rem', md: '5rem', lg: '6rem', xl: '7rem' }}
@@ -81,7 +80,7 @@ function Home() {
       {/**DIALIG TO OPEN SERVICES */}
       <ServicesDialog />
 
-      <Container ref={aboutRef} pt={'12rem'}>
+      <Box ref={aboutRef} pt={'12rem'}>
         <Heading
           pb={'6rem'}
           pt={'4rem'}
@@ -103,8 +102,8 @@ function Home() {
           backgroundColor={'#fa823f'}
           color={'whiteAlpha.700'}
           padding={'20px'}
-          mx={'auto'}
           boxShadow={'1px 1px 3px 3px #fa823f'}
+          w={'100%'}
         >
           <Text
             fontSize={{ base: '20px', md: '24px', lg: '26px', xl: '26px' }}
@@ -125,11 +124,11 @@ function Home() {
             passion, and it shows in every service delivered.
           </Text>
         </Flex>
-      </Container>
+      </Box>
       <ClientReviews />
       <ViewReviews />
       <AddReview />
-    </Container>
+    </Box>
   );
 }
 

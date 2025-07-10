@@ -27,6 +27,7 @@ import {
   Input,
   Portal,
   RatingGroup,
+  Spinner,
   Stack,
   Text,
   Textarea,
@@ -35,12 +36,45 @@ import {
 import { FcGoogle } from 'react-icons/fc';
 import React, { useState } from 'react';
 import { FaStar } from 'react-icons/fa';
+import useRatingSubmit from '../hooks/useRatingSubmit';
+import useLoginRatingAuth from '../hooks/useLoginRatingAuth';
+import useShowToast from '../hooks/useShowToast.js';
+import { TbLogout2 } from 'react-icons/tb';
 
 function AddReview() {
   const [loggedIn, setLoggedIn] = useState(true);
-  const [review, setReview] = useState('');
-  const [rating, setRating] = useState(0);
-  const [hover, setHover] = useState(0);
+  const { user, login, logout, authLoading } = useLoginRatingAuth();
+  const { handleRatingSubmit, isLoading } = useRatingSubmit();
+  const { successRatingToast, errorRatingToast, infoRatingToast } =
+    useShowToast();
+  const [userRating, setUserRating] = useState({
+    reviewMessage: '',
+    rating: 0,
+  });
+
+  // Function for submitting data to Rating Hook
+  async function handleSubmit(e) {
+    e.preventDefault();
+    if (userRating.rating === 0 || userRating.reviewMessage.trim() === '') {
+      infoRatingToast();
+      return;
+    }
+    await handleRatingSubmit(userRating);
+    setUserRating({
+      reviewMessage: '',
+      rating: 0,
+    });
+  }
+
+  // If authorising is loading display Spinner
+  if (authLoading) {
+    return (
+      <Box>
+        <Spinner color={'black'} size={'xl'} />
+      </Box>
+    );
+  }
+
   return (
     <Flex
       pt={'2rem'}
@@ -61,6 +95,7 @@ function AddReview() {
       </Heading>
 
       <DialogRoot modal={true} lazyMount placement={'top'} size={'full'}>
+        {/*Dialog Trigger Button */}
         <DialogTrigger asChild>
           <Button
             mt={'2.5rem'}
@@ -91,7 +126,7 @@ function AddReview() {
         <Portal>
           <DialogBackdrop bgColor={'#fa823f'} />
 
-          <DialogPositioner zIndex={1001}>
+          <DialogPositioner>
             <DialogContent bgColor={'#fa823f'}>
               {/**CLOSE DIALOG BUTTON */}
               <Flex pt={'1rem'} px={'1rem'} justifyContent={'end'}>
@@ -125,7 +160,7 @@ function AddReview() {
               </Flex>
 
               {/**HEADING FOR LOGGED IN OR LOGGED OUT*/}
-              {loggedIn ? (
+              {user ? (
                 <DialogHeader placeContent={'center'} color={'whiteAlpha.700'}>
                   {' '}
                   <DialogTitle
@@ -166,7 +201,7 @@ function AddReview() {
               )}
 
               {/**Displayed if logged in */}
-              {loggedIn ? (
+              {user ? (
                 <DialogBody>
                   <Flex
                     px={'4rem'}
@@ -226,137 +261,191 @@ function AddReview() {
                         </Text>
                       </VStack>
                       <FieldsetContent>
-                        <FieldRoot
-                          pb={'4rem'}
-                          alignItems={{
-                            base: 'center',
-                            md: 'center',
-                            lg: 'start',
-                            xl: 'start',
-                          }}
-                        >
-                          <FieldLabel
-                            pb={'20px'}
-                            as={'label'}
-                            color={'#fa823f'}
+                        <Flex flexDir={'column'}>
+                          <Text
+                            color={'whiteAlpha.800'}
+                            textAlign={'center'}
                             fontSize={{
-                              base: '16px',
-                              md: '18px',
-                              lg: '20px',
-                              xl: '22px',
+                              base: '18px',
+                              md: '20px',
+                              lg: '24px',
+                              xl: '24px',
                             }}
+                            pb={'1rem'}
+                            fontWeight={'bold'}
+                          >{`Hello, ${user.displayName}`}</Text>
+                          <Button
+                            color={'black'}
+                            bgColor={'#fa823f'}
+                            _hover={{
+                              color: '#fa823f',
+                              bgColor: 'black',
+                              borderColor: '#fa823f',
+                            }}
+                            mx={'auto'}
+                            w={{ base: '70%', md: '30%', lg: '30%', xl: '20%' }}
+                            borderRadius={{
+                              base: '20px',
+                              md: '20px',
+                              lg: '60px',
+                              xl: '60px',
+                            }}
+                            mb={'2rem'}
+                            gap={2}
+                            onClick={logout}
                           >
-                            Rating
-                          </FieldLabel>
-                          {/**Rating system */}
-                          <HStack>
-                            {[1, 2, 3, 4, 5].map(star => (
-                              <Box
-                                key={star}
-                                as="button"
-                                onClick={() => setRating(star)}
-                                onMouseEnter={() => setHover(star)}
-                                onMouseLeave={() => setHover(0)}
-                              >
-                                <Icon
-                                  as={FaStar}
-                                  boxSize={{
-                                    base: '20px',
-                                    md: '22px',
-                                    lg: '24px',
-                                    xl: '24px',
-                                  }}
-                                  color={
-                                    (hover || rating) >= star
-                                      ? '#fa823f'
-                                      : '#E0E0E0'
-                                  }
-                                />
-                              </Box>
-                            ))}
-                          </HStack>
-                        </FieldRoot>
+                            Logout
+                            <span>
+                              <Icon
+                                boxSize={{
+                                  base: '20px',
+                                  md: '20px',
+                                  lg: '30px',
+                                  xl: '30px',
+                                }}
+                                as={TbLogout2}
+                              />
+                            </span>
+                          </Button>
+                        </Flex>
 
-                        <FieldRoot
-                          pb={'4rem'}
-                          alignItems={{
-                            base: 'center',
-                            md: 'center',
-                            lg: 'start',
-                            xl: 'start',
-                          }}
-                        >
-                          <FieldLabel
-                            pb={'20px'}
-                            as={'label'}
-                            color={'#fa823f'}
-                            fontSize={{
-                              base: '16px',
-                              md: '18px',
-                              lg: '20px',
-                              xl: '22px',
+                        <form onSubmit={handleSubmit}>
+                          <FieldRoot
+                            pb={'4rem'}
+                            alignItems={{
+                              base: 'center',
+                              md: 'center',
+                              lg: 'start',
+                              xl: 'start',
                             }}
                           >
-                            Message
-                          </FieldLabel>
-                          <Textarea
-                            as={'textarea'}
-                            borderWidth={'2px'}
-                            color={'white'}
-                            borderRadius={'10px'}
-                            backgroundColor={'black'}
-                            focusRing={'none'}
-                            borderColor={'#fa823f'}
-                            required
-                            h={'10rem'}
-                            w={{
-                              base: '100%',
-                              md: '100%',
-                              lg: '100%',
-                              xl: '100%',
+                            <FieldLabel
+                              pb={'20px'}
+                              as={'label'}
+                              color={'#fa823f'}
+                              fontSize={{
+                                base: '16px',
+                                md: '18px',
+                                lg: '20px',
+                                xl: '22px',
+                              }}
+                            >
+                              Rating
+                            </FieldLabel>
+
+                            {/**Rating system */}
+                            <HStack>
+                              <RatingGroup.Root
+                                colorPalette={'orange'}
+                                count={5}
+                                size="lg"
+                                onValueChange={({ value }) =>
+                                  setUserRating({
+                                    ...userRating,
+                                    rating: value,
+                                  })
+                                }
+                                value={userRating.rating}
+                              >
+                                <RatingGroup.HiddenInput />
+                                <RatingGroup.Control />
+                              </RatingGroup.Root>
+                            </HStack>
+                          </FieldRoot>
+
+                          <FieldRoot
+                            pb={'4rem'}
+                            alignItems={{
+                              base: 'center',
+                              md: 'center',
+                              lg: 'start',
+                              xl: 'start',
                             }}
-                          />
-                        </FieldRoot>
-                        <Button
-                          alignSelf={{
-                            base: 'center',
-                            md: 'center',
-                            lg: 'start',
-                            xl: 'start',
-                          }}
-                          w={{
-                            base: '8rem',
-                            md: '8.5rem',
-                            lg: '10rem',
-                            xl: '10rem',
-                          }}
-                          h={{
-                            base: '3rem',
-                            md: '3.5rem',
-                            lg: '4rem',
-                            xl: '4.5rem',
-                          }}
-                          borderRadius={{
-                            base: '20px',
-                            md: '20px',
-                            lg: '35px',
-                            xl: '35px',
-                          }}
-                          color={'black'}
-                          bgColor={'#fa823f'}
-                          borderWidth={'2px'}
-                          borderColor={'black'}
-                          fontSize={'18px'}
-                          cursor={'pointer'}
-                          _hover={{
-                            color: '#fa823f',
-                            bgColor: 'black',
-                            borderWidth: '2px',
-                            borderColor: '#fa823f',
-                          }}
-                        >
-                          Submit
-                        </Button>
+                          >
+                            <FieldLabel
+                              pb={'20px'}
+                              as={'label'}
+                              color={'#fa823f'}
+                              fontSize={{
+                                base: '16px',
+                                md: '18px',
+                                lg: '20px',
+                                xl: '22px',
+                              }}
+                            >
+                              Message
+                            </FieldLabel>
+                            <Textarea
+                              as={'textarea'}
+                              borderWidth={'2px'}
+                              color={'white'}
+                              borderRadius={'10px'}
+                              backgroundColor={'black'}
+                              focusRing={'none'}
+                              borderColor={'#fa823f'}
+                              required
+                              h={'10rem'}
+                              w={{
+                                base: '100%',
+                                md: '100%',
+                                lg: '50%',
+                                xl: '50%',
+                              }}
+                              value={userRating.reviewMessage}
+                              onChange={e =>
+                                setUserRating({
+                                  ...userRating,
+                                  reviewMessage: e.target.value,
+                                })
+                              }
+                            />
+                          </FieldRoot>
+                          <Flex
+                            justifyContent={{
+                              base: 'center',
+                              md: 'center',
+                              lg: 'flex-start',
+                              xl: 'flex-start',
+                            }}
+                          >
+                            <Button
+                              w={{
+                                base: '100%',
+                                md: '50%',
+                                lg: '10rem',
+                                xl: '20%',
+                              }}
+                              h={{
+                                base: '3rem',
+                                md: '3.5rem',
+                                lg: '4rem',
+                                xl: '4.5rem',
+                              }}
+                              borderRadius={{
+                                base: '20px',
+                                md: '20px',
+                                lg: '35px',
+                                xl: '35px',
+                              }}
+                              color={'black'}
+                              bgColor={'#fa823f'}
+                              borderWidth={'2px'}
+                              borderColor={'black'}
+                              fontSize={'18px'}
+                              cursor={'pointer'}
+                              _hover={{
+                                color: '#fa823f',
+                                bgColor: 'black',
+                                borderWidth: '2px',
+                                borderColor: '#fa823f',
+                              }}
+                              type="submit"
+                              loading={isLoading}
+                            >
+                              Submit
+                            </Button>
+                          </Flex>
+                        </form>
                       </FieldsetContent>
                     </FieldsetRoot>
                   </Flex>
@@ -391,6 +480,7 @@ function AddReview() {
                       lg: '40px',
                       xl: '40px',
                     }}
+                    onClick={login}
                   >
                     Login{' '}
                     <span>

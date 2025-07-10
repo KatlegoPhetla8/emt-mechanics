@@ -59,7 +59,7 @@ function ServicesDialog() {
         <Portal>
           <DialogBackdrop bgColor={'#fa823f'} />
 
-          <DialogPositioner zIndex={1000}>
+          <DialogPositioner>
             <DialogContent bgColor={'#fa823f'}>
               {/**CLOSE DIALOG BUTTON */}
               <Flex pt={'1rem'} px={'1rem'} justifyContent={'end'}>

@@ -43,7 +43,7 @@ function ClientReviews() {
     },
   ];
   return (
-    <Container ref={reviewsRef} mt={'12rem'} backgroundColor={'whiteAlpha.100'}>
+    <Box ref={reviewsRef} mt={'12rem'} backgroundColor={'whiteAlpha.100'}>
       <Heading
         pt={'4rem'}
         color={'#fa823f'}
@@ -111,12 +111,18 @@ function ClientReviews() {
                 {client.message}
               </Text>
 
-              <Box mx={'auto'}>
-                <RatingGroup.Root readOnly count={client.stars} size="sm">
+              <Stack mx={'auto'}>
+                <RatingGroup.Root
+                  colorPalette={'orange'}
+                  readOnly
+                  count={client.stars}
+                  defaultValue={client.stars}
+                  size="md"
+                >
                   <RatingGroup.HiddenInput />
                   <RatingGroup.Control />
                 </RatingGroup.Root>
-              </Box>
+              </Stack>
 
               <Text
                 color={'#fa823f'}
@@ -130,7 +136,7 @@ function ClientReviews() {
           </Box>
         ))}
       </Grid>
-    </Container>
+    </Box>
   );
 }
 
