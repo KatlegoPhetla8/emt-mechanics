@@ -1,5 +1,13 @@
-import { Box, Container, Flex, Heading, Text } from '@chakra-ui/react';
-import React, { useContext, useState } from 'react';
+import {
+  Box,
+  Center,
+  Container,
+  Flex,
+  Heading,
+  Spinner,
+  Text,
+} from '@chakra-ui/react';
+import React, { useContext, useEffect, useState } from 'react';
 import ClientReviews from './ClientReviews.jsx';
 import Enquire from './Enquire.jsx';
 import ServicesDialog from './ServicesDialog.jsx';
@@ -8,58 +16,123 @@ import ViewReviews from './ViewReviews.jsx';
 import { GlobalStateContext } from '../context/ContextProvider.jsx';
 
 function Home() {
+  const [isLoaded, setIsLoaded] = useState(false);
   const { homeRef, servicesRef, aboutRef } = useContext(GlobalStateContext);
-
+  useEffect(() => {
+    const img = new window.Image();
+    img.src = 'Hero.png';
+    img.onload = () => setIsLoaded(true);
+  }, []);
   return (
     <Box pb={'8rem'}>
-      <Box
-        minH={'1000px'}
-        overscrollBehavior={'contain'}
-        ref={homeRef}
-        className="hero-section"
-        position={'relative'}
-        height={{ base: '100vh', md: '100vh', lg: '100vh', xl: '100vh' }}
-        w={'100%'}
-        bgImage={`url("/Hero.png")`}
-        transition={'filter 0.3s ease'}
-        bgSize={'cover'}
-        backgroundPosition={'center'}
-        display={'flex'}
-        alignItems={'center'}
-        flexDir={'column'}
-        justifyContent={{
-          base: 'center',
-          md: 'center',
-          lg: 'center',
-          xl: 'center',
-        }}
-        pt={{ base: undefined, md: '40px', lg: '60px' }}
-        px={'1.5rem'}
-        gap={{ base: '1.5rem', md: '1rem', lg: '1rem', xl: '1.5rem' }}
-      >
-        <Heading
-          lineHeight={{ base: '3.5rem', md: '5rem', lg: '6rem', xl: '7rem' }}
-          fontSize={{ base: '60px', md: '80px', lg: '100px', xl: '140px' }}
-          css={{
-            '@media (max-width: 390px)': {
-              fontSize: '45px',
-              lineHeight: '2.5rem',
-            },
+      {isLoaded ? (
+        <Box
+          minH={{ base: undefined, md: undefined, lg: '1000px', xl: '1000px' }}
+          overscrollBehavior={'contain'}
+          ref={homeRef}
+          className="hero-section"
+          position={'relative'}
+          height={{ base: '100vh', md: '100vh', lg: '100vh', xl: '100vh' }}
+          w={'100%'}
+          bgImage={`url("/Hero.png")`}
+          transition={'filter 0.3s ease'}
+          bgSize={'cover'}
+          backgroundPosition={'center'}
+          display={'flex'}
+          alignItems={'center'}
+          flexDir={'column'}
+          justifyContent={{
+            base: 'center',
+            md: 'center',
+            lg: 'center',
+            xl: 'center',
           }}
-          as={'h1'}
-          textAlign={'center'}
-          textShadow={' 1px 2px 2px #fa823f'}
+          pt={{ base: undefined, md: '40px', lg: '60px' }}
+          px={'1.5rem'}
+          gap={{ base: '1.5rem', md: '1rem', lg: '1rem', xl: '1.5rem' }}
         >
-          FAST.
-          <br />
-          HONEST.
-          <br />
-          LOCAL CAR
-          <br />
-          REPAIRS.
-        </Heading>
-        <Enquire />
-      </Box>
+          <Heading
+            lineHeight={{ base: '3.5rem', md: '5rem', lg: '6rem', xl: '7rem' }}
+            fontSize={{ base: '60px', md: '80px', lg: '100px', xl: '140px' }}
+            css={{
+              '@media (max-width: 390px)': {
+                fontSize: '45px',
+                lineHeight: '2.5rem',
+              },
+            }}
+            as={'h1'}
+            textAlign={'center'}
+            textShadow={' 1px 2px 2px #fa823f'}
+          >
+            FAST.
+            <br />
+            HONEST.
+            <br />
+            LOCAL CAR
+            <br />
+            REPAIRS.
+          </Heading>
+          <Enquire />
+        </Box>
+      ) : (
+        <Box>
+          <Box
+            height={{ base: '100vh', md: '100vh', lg: '100vh', xl: '100vh' }}
+            w={'100%'}
+            bgColor={'black'}
+            display={'flex'}
+            alignItems={'center'}
+            flexDir={'column'}
+            justifyContent={{
+              base: 'center',
+              md: 'center',
+              lg: 'center',
+              xl: 'center',
+            }}
+            color={'black'}
+            position="relative"
+            aria-busy="true"
+            userSelect="none"
+            pt={{ base: undefined, md: '40px', lg: '60px' }}
+            px={'1.5rem'}
+            gap={{ base: '1.5rem', md: '1rem', lg: '1rem', xl: '1.5rem' }}
+          >
+            <Heading
+              lineHeight={{
+                base: '3.5rem',
+                md: '5rem',
+                lg: '6rem',
+                xl: '7rem',
+              }}
+              fontSize={{ base: '60px', md: '80px', lg: '100px', xl: '140px' }}
+              css={{
+                '@media (max-width: 390px)': {
+                  fontSize: '45px',
+                  lineHeight: '2.5rem',
+                },
+              }}
+              color={'#fa823f'}
+              as={'h1'}
+              textAlign={'center'}
+              textShadow={' 1px 2px 2px black'}
+            >
+              FAST.
+              <br />
+              HONEST.
+              <br />
+              LOCAL CAR
+              <br />
+              REPAIRS.
+            </Heading>
+            <Enquire />
+            <Box pos="absolute" inset="0" bg="bg/80">
+              <Center h="full">
+                <Spinner size={'xl'} color={'#fa823f'} />
+              </Center>
+            </Box>
+          </Box>
+        </Box>
+      )}
 
       <Heading
         ref={servicesRef}

@@ -33,6 +33,7 @@ function ServicesDialog() {
       <DialogRoot modal={true} lazyMount placement={'top'} size={'full'}>
         <DialogTrigger asChild>
           <Image
+            loading="lazy"
             filter={'brightness(70%)'}
             cursor={'pointer'}
             boxShadow={'1px 1px 3px 3px rgb(0, 0, 0, 0.3)'}
